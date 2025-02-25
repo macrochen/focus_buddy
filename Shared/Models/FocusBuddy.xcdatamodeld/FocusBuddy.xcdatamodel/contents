@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="20G1427" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="FocusSession" representedClassName="FocusSession" syncable="YES">
+        <attribute name="actualDuration" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="endTime" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="isCompleted" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="musicTrack" optional="YES" attributeType="String"/>
+        <attribute name="plannedDuration" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="startTime" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="usedMusic" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <relationship name="interruptions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Interruption" inverseName="session" inverseEntity="Interruption"/>
+        <relationship name="task" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FocusTask" inverseName="focusSessions" inverseEntity="FocusTask"/>
+    </entity>
+    <entity name="FocusTask" representedClassName="FocusTask" syncable="YES">
+        <attribute name="actualTime" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="category" attributeType="String" defaultValueString=""/>
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="deadline" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="endTime" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="estimatedTime" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="startTime" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="status" attributeType="String" defaultValueString="未开始"/>
+        <attribute name="taskDescription" attributeType="String" defaultValueString=""/>
+        <attribute name="title" attributeType="String"/>
+        <relationship name="focusSessions" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="FocusSession" inverseName="task" inverseEntity="FocusSession"/>
+        <relationship name="interruptions" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Interruption" inverseName="task" inverseEntity="Interruption"/>
+    </entity>
+    <entity name="Interruption" representedClassName="Interruption" syncable="YES">
+        <attribute name="duration" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="endTime" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="note" optional="YES" attributeType="String"/>
+        <attribute name="reason" optional="YES" attributeType="String"/>
+        <attribute name="startTime" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="session" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FocusSession" inverseName="interruptions" inverseEntity="FocusSession"/>
+        <relationship name="task" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="FocusTask" inverseName="interruptions" inverseEntity="FocusTask"/>
+    </entity>
+    <entity name="TaskTemplate" representedClassName="TaskTemplate" syncable="YES">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="estimatedTime" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="order" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="title" optional="YES" attributeType="String"/>
+    </entity>
+    <elements>
+        <element name="FocusSession" positionX="160" positionY="192" width="128" height="164"/>
+        <element name="FocusTask" positionX="160" positionY="192" width="128" height="239"/>
+        <element name="Interruption" positionX="160" positionY="192" width="128" height="149"/>
+        <element name="TaskTemplate" positionX="171" positionY="279" width="128" height="89"/>
+    </elements>
+</model>
