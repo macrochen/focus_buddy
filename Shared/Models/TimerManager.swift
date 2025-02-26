@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import CoreData
+import SwiftUI
 
 class TimerManager: ObservableObject {
     @Published var isRunning = false
@@ -42,6 +43,14 @@ class TimerManager: ObservableObject {
         }
     }
     
+    private var hasPlayedHalfwayPrompt = false
+    private var hasPlayedNearEndPrompt = false
+    
+    // 移除 @AppStorage，改用 UserDefaults
+    private var enableVoicePrompt: Bool {
+        UserDefaults.standard.bool(forKey: "enableVoicePrompt")
+    }
+    
     func start(totalMinutes: Int32) {
         if timer == nil {
             startTime = Date()
@@ -51,9 +60,31 @@ class TimerManager: ObservableObject {
         }
         
         isRunning = true
+        hasPlayedHalfwayPrompt = false
+        hasPlayedNearEndPrompt = false
+        
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             guard let self = self else { return }
             self.elapsedTime += 1
+            
+            // 检查是否到达一半时间
+            let halfwayPoint = Int(totalMinutes * 60) / 2
+            if self.elapsedTime == halfwayPoint && !self.hasPlayedHalfwayPrompt {
+                AudioManager.shared.speak("时间已经过一半啦，继续加油！")
+                self.hasPlayedHalfwayPrompt = true
+            }
+            
+            // 检查是否接近结束（还剩2分钟或一半时间）
+            let remainingSeconds = Int(totalMinutes * 60) - self.elapsedTime
+            let warningPoint = min(120, Int(totalMinutes * 60) / 4)  // 取2分钟或总时长1/4的较小值
+            if remainingSeconds == warningPoint && !self.hasPlayedNearEndPrompt && totalMinutes > 1 {
+                if totalMinutes <= 2 {
+                    AudioManager.shared.speak("还剩30秒，即将完成！")
+                } else {
+                    AudioManager.shared.speak("还剩\(warningPoint/60)分钟，即将完成！")
+                }
+                self.hasPlayedNearEndPrompt = true
+            }
             
             // 检查是否超时
             if self.elapsedTime >= Int(totalMinutes * 60) {

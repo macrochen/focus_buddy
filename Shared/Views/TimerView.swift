@@ -55,27 +55,16 @@ struct TimerView: View {
             HStack(spacing: 30) {
                 Button(action: {
                     if timerManager.isRunning {
-                        // 如果计时器正在运行，暂停并显示中断记录界面
-                        timerManager.pause()
-                        showingInterruptionView = true 
-                    } else {
-                        // 处理未完成的中断记录
-                        if let currentSession = timerManager.currentSession,
-                           let interruptions = currentSession.interruptions?.allObjects as? [Interruption],
-                           let lastInterruption = interruptions.last,
-                           lastInterruption.duration == 0 {
-                            // 计算中断持续时间并保存
-                            let duration = Date().timeIntervalSince(lastInterruption.startTime ?? Date())
-                            lastInterruption.duration = Int32(duration)
-                            try? viewContext.save()
-                        }
-                        // 开始新的计时并更新任务状态
+                        // 如果计时器正在运行，显示中断记录界面
+                        showingInterruptionView = true
+                    } else if timerManager.currentSession == nil {
+                        // 如果没有会话，先启动计时器创建会话
                         timerManager.start(totalMinutes: task.estimatedTime)
-                        task.status = "进行中"
-                        try? viewContext.save()
+                    } else {
+                        // 如果已有会话且计时器暂停，恢复计时
+                        timerManager.resume()
                     }
                 }) {
-                    // 根据计时器状态显示不同的按钮图标
                     Image(systemName: timerManager.isRunning ? "pause.circle.fill" : "play.circle.fill")
                         .resizable()
                         .frame(width: 60, height: 60)
@@ -128,17 +117,15 @@ struct TimerView: View {
                 .padding(.horizontal)
             }
         }
-        .sheet(isPresented: $showingInterruptionView, onDismiss: {
-            // 只有在取消或强制关闭时才恢复计时
-            if let currentSession = timerManager.currentSession,
-               let interruptions = currentSession.interruptions?.allObjects as? [Interruption],
-               interruptions.isEmpty {  // 如果没有中断记录，说明是取消或强制关闭
-                timerManager.resume()
+        .sheet(isPresented: $showingInterruptionView) {
+            if let currentSession = timerManager.currentSession {
+                InterruptionView(session: currentSession, onDismiss: { confirmed in
+                    if confirmed {
+                        timerManager.pause()
+                    }
+                    showingInterruptionView = false
+                })
             }
-        }) {
-            InterruptionView(session: timerManager.currentSession!, onDismiss: {
-                showingInterruptionView = false
-            })
         }
         
         .navigationTitle("专注计时")

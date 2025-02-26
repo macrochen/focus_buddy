@@ -6,7 +6,7 @@ struct InterruptionView: View {
     @State private var selectedReason: String = InterruptionReason.rest.rawValue  // 改为使用 String 类型
     @State private var note: String = ""
     let session: FocusSession
-    let onDismiss: () -> Void
+    let onDismiss: (Bool) -> Void  // 添加 confirmed 参数
     
     private var allReasons: [String] {
         let defaultReasons = InterruptionReason.allCases.map { $0.rawValue }
@@ -45,6 +45,17 @@ struct InterruptionView: View {
     }
     
     private func saveInterruption() {
+        // 先检查是否有进行中的中断记录
+        if let interruptions = session.interruptions?.allObjects as? [Interruption],
+           let lastInterruption = interruptions.last,
+           lastInterruption.duration == 0 {
+            // 如果有未完成的中断，先结束它
+            let endTime = Date()
+            lastInterruption.endTime = endTime
+            lastInterruption.duration = Int32(endTime.timeIntervalSince(lastInterruption.startTime ?? endTime))
+        }
+        
+        // 创建新的中断记录
         let interruption = Interruption(context: viewContext)
         interruption.id = UUID()
         interruption.startTime = Date()
@@ -54,9 +65,14 @@ struct InterruptionView: View {
         
         do {
             try viewContext.save()
-            dismiss()
+            onDismiss(true)  // 确认中断
         } catch {
             print("Error saving interruption: \(error)")
         }
+    }
+    
+    // 取消按钮动作
+    private func cancel() {
+        onDismiss(false)  // 取消中断
     }
 }

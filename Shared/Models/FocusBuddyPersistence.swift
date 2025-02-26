@@ -1,6 +1,6 @@
 import CoreData
 
-struct FocusBuddyPersistence {
+class FocusBuddyPersistence {
     static let shared = FocusBuddyPersistence()
     
     let container: NSPersistentContainer
@@ -10,6 +10,13 @@ struct FocusBuddyPersistence {
         
         if inMemory {
             container.persistentStoreDescriptions.first?.url = URL(fileURLWithPath: "/dev/null")
+        } else {
+            // 设置数据存储在 App Group 中
+            if let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.yourname.focusbuddy") {
+                let storeUrl = url.appendingPathComponent("FocusBuddy.sqlite")
+                let description = NSPersistentStoreDescription(url: storeUrl)
+                container.persistentStoreDescriptions = [description]
+            }
         }
         
         container.loadPersistentStores { description, error in

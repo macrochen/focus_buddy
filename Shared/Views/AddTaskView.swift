@@ -21,6 +21,12 @@ struct AddTaskView: View {
         _estimatedTime = State(initialValue: task?.estimatedTime ?? 0 > 0 ? String(task?.estimatedTime ?? 0) : "")
     }
     
+    // 添加一个用于验证输入的函数
+    private func isValidNumber(_ string: String) -> Bool {
+        let allowedCharacters = CharacterSet.decimalDigits
+        return string.unicodeScalars.allSatisfy { allowedCharacters.contains($0) }
+    }
+    
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -61,14 +67,24 @@ struct AddTaskView: View {
                         .textFieldStyle(.roundedBorder)
                         .keyboardType(.numberPad)
                         .submitLabel(.done)
-                        
-                        if !estimatedTime.isEmpty {
-                            Button(action: { estimatedTime = "" }) {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(.gray)
+                        .onChange(of: estimatedTime) { newValue in
+                            // 只允许输入数字
+                            if !isValidNumber(newValue) {
+                                estimatedTime = String(newValue.filter { $0.isNumber })
+                            }
+                            // 限制最大值为 480 分钟（8小时）
+                            if let number = Int(estimatedTime), number > 480 {
+                                estimatedTime = "480"
                             }
                         }
+                        
+                    if !estimatedTime.isEmpty {
+                        Button(action: { estimatedTime = "" }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.gray)
+                        }
                     }
+                }
                 .padding(.horizontal)
             }
             .padding(.vertical)
@@ -83,9 +99,6 @@ struct AddTaskView: View {
         .navigationTitle(isEditing ? "编辑任务" : "新建任务")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button("取消") { dismiss() }
-            }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(isEditing ? "保存" : "添加") { saveTask() }
                     .disabled(title.isEmpty || estimatedTime.isEmpty)
@@ -102,7 +115,12 @@ struct AddTaskView: View {
     private func saveTask() {
         let taskToSave = task ?? FocusTask(context: viewContext)
         taskToSave.title = title
-        taskToSave.estimatedTime = Int32(estimatedTime) ?? 25
+        // 确保有有效的时间值
+        if let time = Int32(estimatedTime), time > 0 {
+            taskToSave.estimatedTime = time
+        } else {
+            taskToSave.estimatedTime = 25 // 默认25分钟
+        }
         if !isEditing {
             taskToSave.createdAt = Date()
             taskToSave.id = UUID()  // 添加这行，为新任务生成 UUID
@@ -112,10 +130,8 @@ struct AddTaskView: View {
         
         do {
             try viewContext.save()
-            print("保存成功，准备显示 alert")  // 添加调试输出
             DispatchQueue.main.async {
                 showingAlert = true
-                print("alert 状态已设置为 true")  // 添加调试输出
             }
         } catch {
             print("Error saving task: \(error)")
