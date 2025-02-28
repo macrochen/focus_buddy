@@ -2,7 +2,7 @@
 //  TaskTemplate+CoreDataProperties.swift
 //  focus_buddy (iOS)
 //
-//  Created by  macrochen on 2025/2/24.
+//  Created by jolin on 2025/2/26.
 //
 //
 
@@ -16,10 +16,10 @@ extension TaskTemplate {
         return NSFetchRequest<TaskTemplate>(entityName: "TaskTemplate")
     }
 
-    @NSManaged public var title: String?
+    @NSManaged public var createdAt: Date?
     @NSManaged public var estimatedTime: Int32
     @NSManaged public var order: Int32
-    @NSManaged public var createdAt: Date?
+    @NSManaged public var title: String?
 
 }
 

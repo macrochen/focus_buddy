@@ -2,7 +2,7 @@
 //  FocusTask+CoreDataProperties.swift
 //  focus_buddy (iOS)
 //
-//  Created by  macrochen on 2025/2/24.
+//  Created by jolin on 2025/2/28.
 //
 //
 
@@ -19,15 +19,17 @@ extension FocusTask {
     @NSManaged public var actualTime: Int32
     @NSManaged public var category: String?
     @NSManaged public var createdAt: Date?
+    @NSManaged public var date: Date?
     @NSManaged public var deadline: Date?
+    @NSManaged public var endTime: Date?
     @NSManaged public var estimatedTime: Int32
     @NSManaged public var id: UUID?
+    @NSManaged public var startTime: Date?
     @NSManaged public var status: String?
     @NSManaged public var taskDescription: String?
     @NSManaged public var title: String?
-    @NSManaged public var date: Date?
-    @NSManaged public var startTime: Date?
-    @NSManaged public var endTime: Date?
+    @NSManaged public var plannedDate: Date?
+    @NSManaged public var order: Int16
     @NSManaged public var focusSessions: NSSet?
     @NSManaged public var interruptions: Interruption?
 

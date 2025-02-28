@@ -25,9 +25,39 @@ struct TaskTemplateEditView: View {
                     .focused($isFocused)
                 
                 HStack {
-                    Text("预计时间：\(estimatedTime)分钟")
+                    Text("预计时间")
                     Spacer()
-                    Stepper("", value: $estimatedTime, in: 1...120)
+                    HStack(spacing: 0) {
+                        Picker("小时", selection: Binding(
+                            get: { Int(estimatedTime) / 60 },
+                            set: { newValue in
+                                let minutes = Int(estimatedTime) % 60
+                                estimatedTime = Int32(newValue * 60 + minutes)
+                            }
+                        )) {
+                            ForEach(0...8, id: \.self) { hour in
+                                Text("\(hour)小时").tag(hour)
+                            }
+                        }
+                        .pickerStyle(.wheel)
+                        .frame(width: 100)
+                        .clipped()
+                        
+                        Picker("分钟", selection: Binding(
+                            get: { Int(estimatedTime) % 60 },
+                            set: { newValue in
+                                let hours = Int(estimatedTime) / 60
+                                estimatedTime = Int32(hours * 60 + newValue)
+                            }
+                        )) {
+                            ForEach(0..<60, id: \.self) { minute in
+                                Text("\(minute)分").tag(minute)
+                            }
+                        }
+                        .pickerStyle(.wheel)
+                        .frame(width: 100)
+                        .clipped()
+                    }
                 }
             }
         }

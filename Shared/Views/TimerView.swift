@@ -1,5 +1,6 @@
 import SwiftUI
 import CoreData
+import AudioToolbox
 
 struct TimerView: View {
     @Environment(\.dismiss) private var dismiss
@@ -23,6 +24,34 @@ struct TimerView: View {
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: endTime)
     }
+
+    private func notifyTaskComplete() {
+        let notificationType = UserDefaults.standard.string(forKey: "notificationType") ?? "sound"
+        let enableVibration = UserDefaults.standard.bool(forKey: "enableVibration")
+        
+        let timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+            switch notificationType {
+            case "sound":
+                AudioServicesPlaySystemSound(1103)
+            case "vibration":
+                if enableVibration {
+                    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
+                }
+            case "both":
+                AudioServicesPlaySystemSound(1103)
+                if enableVibration {
+                    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
+                }
+            default:
+                break
+            }
+        }
+        
+        // 3秒后停止定时器
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+            timer.invalidate()
+        }
+    }
     
     var body: some View {
         VStack(spacing: 30) {
@@ -39,6 +68,11 @@ struct TimerView: View {
                     .font(.system(size: 60, weight: .bold, design: .rounded))
                     .frame(height: 100)
                     .foregroundColor(timerManager.isOvertime ? .red : .primary)  // 超时显示红色
+                    .onChange(of: timerManager.isOvertime) { isOvertime in
+                        if isOvertime {
+                            notifyTaskComplete()  // 在计时器超时时发出提醒
+                        }
+                    }
                 
                 if timerManager.isOvertime {
                     Text("已超出预计时间")

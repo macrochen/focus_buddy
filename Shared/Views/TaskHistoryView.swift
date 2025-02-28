@@ -5,6 +5,23 @@ import Foundation
 struct TaskHistoryView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var selectedDate = Date()
+    @FetchRequest private var tasks: FetchedResults<FocusTask>
+    
+    init() {
+        // 只显示已完成的任务
+        let predicate = NSPredicate(format: "status == %@ OR status == %@ OR status == %@",
+            "已完成",
+            "已中断",
+            "进行中"
+        )
+        
+        _tasks = FetchRequest<FocusTask>(
+            entity: FocusTask.entity(),
+            sortDescriptors: [NSSortDescriptor(keyPath: \FocusTask.date, ascending: false)],
+            predicate: predicate,
+            animation: .default
+        )
+    }
     
     var body: some View {
         List {
@@ -17,6 +34,10 @@ struct TaskHistoryView: View {
                 if !tasks.isEmpty {
                     Section {
                         DailySummaryView(tasks: tasks)
+                    }
+                    
+                    Section {
+                        TaskTimesPieChart(tasks: tasks)
                     }
                     
                     Section {
@@ -41,7 +62,14 @@ struct TaskHistoryView: View {
         let end = calendar.date(byAdding: .day, value: 1, to: start)!
         
         let request = FocusTask.fetchRequest()
-        request.predicate = NSPredicate(format: "date >= %@ AND date < %@", start as NSDate, end as NSDate)
+        // 同时过滤日期和状态
+        request.predicate = NSPredicate(format: "date >= %@ AND date < %@ AND (status == %@ OR status == %@ OR status == %@)", 
+            start as NSDate, 
+            end as NSDate,
+            "已完成",
+            "已中断",
+            "进行中"
+        )
         request.sortDescriptors = [NSSortDescriptor(keyPath: \FocusTask.startTime, ascending: true)]
         
         return try? viewContext.fetch(request)
@@ -237,8 +265,10 @@ struct DailySummaryView: View {
     private func getAllInterruptions() -> [Interruption] {
         var allInterruptions: [Interruption] = []
         for task in tasks {
-            if let interruptions = task.interruptions as? Set<Interruption> {
-                allInterruptions.append(contentsOf: interruptions)
+            if let session = task.focusSessions?.allObjects.first as? FocusSession,
+                let interruptions = session.interruptions as? Set<Interruption>,  // Fix the casting here
+                !interruptions.isEmpty {
+                    allInterruptions.append(contentsOf: interruptions)
             }
         }
         return allInterruptions
