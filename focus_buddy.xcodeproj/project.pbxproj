@@ -31,6 +31,7 @@
 		84ECD69F2D6DE67200039F5F /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84ECD69E2D6DE67200039F5F /* AudioManager.swift */; };
 		84ECD6A12D6DE6CC00039F5F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84ECD6A02D6DE6CC00039F5F /* SettingsView.swift */; };
 		D232F0262D71998B008B849B /* TaskTimesPieChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = D232F0252D71998B008B849B /* TaskTimesPieChart.swift */; };
+		D232F0282D71F480008B849B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D232F0272D71F480008B849B /* Assets.xcassets */; };
 		D2F309EF2D6F1C1800A6FF47 /* FocusSession+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F309EC2D6F1C1800A6FF47 /* FocusSession+CoreDataProperties.swift */; };
 		D2F309F02D6F1C1800A6FF47 /* TaskTemplate+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F309EE2D6F1C1800A6FF47 /* TaskTemplate+CoreDataProperties.swift */; };
 		D2F309F12D6F1C1800A6FF47 /* FocusSession+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F309EB2D6F1C1800A6FF47 /* FocusSession+CoreDataClass.swift */; };
@@ -65,6 +66,7 @@
 		84ECD69E2D6DE67200039F5F /* AudioManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioManager.swift; sourceTree = "<group>"; };
 		84ECD6A02D6DE6CC00039F5F /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		D232F0252D71998B008B849B /* TaskTimesPieChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTimesPieChart.swift; sourceTree = "<group>"; };
+		D232F0272D71F480008B849B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D2F309EB2D6F1C1800A6FF47 /* FocusSession+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FocusSession+CoreDataClass.swift"; sourceTree = "<group>"; };
 		D2F309EC2D6F1C1800A6FF47 /* FocusSession+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FocusSession+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		D2F309ED2D6F1C1800A6FF47 /* TaskTemplate+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskTemplate+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 				84E2A8612D6BDE5D00863E9A /* FocusBuddyApp.swift */,
 				84E2A82F2D6B5BEC00863E9A /* Models */,
 				84E2A8382D6B5BEC00863E9A /* Views */,
+				D232F0272D71F480008B849B /* Assets.xcassets */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -262,6 +265,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D232F0282D71F480008B849B /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -436,6 +440,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -472,6 +477,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
