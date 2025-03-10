@@ -98,6 +98,7 @@
 		D28D7DF12D7EA31500692EEE /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		D28D7DF32D7EA31500692EEE /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		D28D7E0B2D7EA71300692EEE /* FocusBuddyWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FocusBuddyWidgetExtension.entitlements; sourceTree = "<group>"; };
+		D28D7E0C2D7EAD8400692EEE /* focus_buddy (iOS).entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "focus_buddy (iOS).entitlements"; sourceTree = "<group>"; };
 		D2F309EB2D6F1C1800A6FF47 /* FocusSession+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FocusSession+CoreDataClass.swift"; sourceTree = "<group>"; };
 		D2F309EC2D6F1C1800A6FF47 /* FocusSession+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FocusSession+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		D2F309ED2D6F1C1800A6FF47 /* TaskTemplate+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskTemplate+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -148,6 +149,7 @@
 		84E299C02D6B4EF700863E9A = {
 			isa = PBXGroup;
 			children = (
+				D28D7E0C2D7EAD8400692EEE /* focus_buddy (iOS).entitlements */,
 				D28D7E0B2D7EA71300692EEE /* FocusBuddyWidgetExtension.entitlements */,
 				84E299C52D6B4EF700863E9A /* Shared */,
 				84E299D72D6B4EFA00863E9A /* macOS */,
@@ -551,6 +553,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "focus_buddy (iOS).entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -588,6 +591,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "focus_buddy (iOS).entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -688,7 +692,7 @@
 				INFOPLIST_FILE = FocusBuddyWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = FocusBuddyWidget;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 16;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -725,7 +729,7 @@
 				INFOPLIST_FILE = FocusBuddyWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = FocusBuddyWidget;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 16;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

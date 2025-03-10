@@ -13,6 +13,10 @@ struct TimerEntry: TimelineEntry {
 struct NoConfigurationIntent: WidgetConfigurationIntent {
     static var title: LocalizedStringResource = "专注计时"
     static var description: LocalizedStringResource = "显示当前专注任务的进度"
+    
+    func perform() async throws -> some IntentResult {
+        return .result()
+    }
 }
 
 struct Provider: TimelineProvider {
@@ -81,29 +85,47 @@ struct FocusBuddyWidgetEntryView : View {
             }
         }
         .padding()
-        .containerBackground(.fill.tertiary, for: .widget)
+        .background(Color(UIColor.systemBackground)) // 替换 containerBackground
     }
 }
 
-struct FocusBuddyWidget: Widget {  // 删除 @main
+struct FocusBuddyWidget: Widget {
     let kind: String = "FocusBuddyWidget"
     
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             FocusBuddyWidgetEntryView(entry: entry)
-                .containerBackground(.fill.tertiary, for: .widget)
+                .background(Color(UIColor.systemBackground))
         }
         .configurationDisplayName("专注计时")
         .description("显示当前专注任务的进度")
-        .supportedFamilies([.systemSmall])
+        .supportedFamilies([.systemSmall, .systemMedium]) // 添加对中尺寸的支持
     }
 }
 
-#Preview {
-    FocusBuddyWidgetEntryView(entry: TimerEntry(
-        date: Date(),
-        taskTitle: "阅读",
-        elapsedTime: 15,
-        totalTime: 25
-    ))
+// 修改预览代码
+struct FocusBuddyWidget_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            // 小尺寸预览
+            FocusBuddyWidgetEntryView(entry: TimerEntry(
+                date: Date(),
+                taskTitle: "阅读",
+                elapsedTime: 15,
+                totalTime: 25
+            ))
+            .previewContext(WidgetPreviewContext(family: .systemSmall))
+            .previewDisplayName("小尺寸")
+            
+            // 中尺寸预览
+            FocusBuddyWidgetEntryView(entry: TimerEntry(
+                date: Date(),
+                taskTitle: "阅读",
+                elapsedTime: 15,
+                totalTime: 25
+            ))
+            .previewContext(WidgetPreviewContext(family: .systemMedium))
+            .previewDisplayName("中尺寸")
+        }
+    }
 }
