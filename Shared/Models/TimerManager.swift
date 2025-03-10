@@ -2,7 +2,9 @@ import Foundation
 import Combine
 import CoreData
 import SwiftUI
+import WidgetKit 
 
+#if os(iOS)  
 class TimerManager: ObservableObject {
     @Published var isRunning = false
     @Published var elapsedTime: Int = 0
@@ -13,9 +15,45 @@ class TimerManager: ObservableObject {
     private let task: FocusTask
     private let context: NSManagedObjectContext
     
+    private var endOfDayTimer: Timer?
+    
     init(task: FocusTask, context: NSManagedObjectContext) {
         self.task = task
         self.context = context
+        
+        // 在初始化时设置当天结束的定时器
+        scheduleEndOfDayTimer()
+    }
+    
+    private func scheduleEndOfDayTimer() {
+        // 获取今天结束的时间（23:59:59）
+        let calendar = Calendar.current
+        var components = calendar.dateComponents([.year, .month, .day], from: Date())
+        components.hour = 23
+        components.minute = 59
+        components.second = 59
+        
+        if let endOfDay = calendar.date(from: components) {
+            endOfDayTimer = Timer.scheduledTimer(withTimeInterval: endOfDay.timeIntervalSinceNow, repeats: false) { [weak self] _ in
+                self?.autoCompleteTask()
+            }
+        }
+    }
+    
+    private func autoCompleteTask() {
+        // 如果任务还在运行，自动完成它
+        if isRunning {
+            stop()
+            task.status = "已完成"
+            task.date = Date()
+            try? context.save()
+        }
+    }
+    
+    deinit {
+        // 清理定时器
+        endOfDayTimer?.invalidate()
+        endOfDayTimer = nil
     }
     
     private func createNewSession() {
@@ -51,12 +89,40 @@ class TimerManager: ObservableObject {
         UserDefaults.standard.bool(forKey: "enableVoicePrompt")
     }
     
+    func syncElapsedTime() {
+        if let startTime = startTime {
+            elapsedTime = Int(Date().timeIntervalSince(startTime))
+            // 检查是否超时
+            if elapsedTime >= Int(task.estimatedTime * 60) {
+                isOvertime = true
+            }
+        }
+    }
+    
+    private func updateWidget() {
+        // 修改这里的 group identifier 要和配置的一致
+        guard let shared = UserDefaults(suiteName: "group.com.macrochen.focusbuddy") else { return }
+        
+        if isRunning {
+            shared.set(task.title, forKey: "currentTaskTitle")
+            shared.set(startTime, forKey: "taskStartTime")
+            shared.set(task.estimatedTime, forKey: "taskTotalTime")
+        } else {
+            shared.removeObject(forKey: "currentTaskTitle")
+            shared.removeObject(forKey: "taskStartTime")
+            shared.removeObject(forKey: "taskTotalTime")
+        }
+        shared.synchronize()
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+    
     func start(totalMinutes: Int32) {
         if timer == nil {
             startTime = Date()
             task.startTime = Date() 
             try? context.save()
             createNewSession()
+            elapsedTime = 0
         }
         
         isRunning = true
@@ -65,7 +131,10 @@ class TimerManager: ObservableObject {
         
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             guard let self = self else { return }
-            self.elapsedTime += 1
+            // 修改这里，不再简单地 +1，而是根据实际时间计算
+            if let startTime = self.startTime {
+                self.elapsedTime = Int(Date().timeIntervalSince(startTime))
+            }
             
             // 检查是否到达一半时间
             let halfwayPoint = Int(totalMinutes * 60) / 2
@@ -92,6 +161,7 @@ class TimerManager: ObservableObject {
                 // 不停止计时器，继续记录时间
             }
         }
+        updateWidget()
     }
     
     func formatTime() -> String {
@@ -112,6 +182,7 @@ class TimerManager: ObservableObject {
             task.endTime = Date()
             try? context.save()
         }
+        updateWidget()
     }
     
     func pause() {
@@ -126,6 +197,7 @@ class TimerManager: ObservableObject {
             task.actualTime = currentElapsed
             try? context.save()
         }
+        updateWidget()
     }
     
     func resume() {
@@ -156,3 +228,4 @@ class TimerManager: ObservableObject {
         }
     }
 }
+#endif

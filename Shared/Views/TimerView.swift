@@ -2,6 +2,7 @@ import SwiftUI
 import CoreData
 import AudioToolbox
 
+#if os(iOS)  
 struct TimerView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
@@ -10,6 +11,7 @@ struct TimerView: View {
     private let task: FocusTask
     @State private var showingInterruptionView = false
     @State private var showingCompletionAlert = false  // 添加在其他 @State 变量旁边
+    @Environment(\.scenePhase) private var scenePhase
     
     init(task: FocusTask) {
         self.task = task
@@ -208,3 +210,4 @@ private let completionMessages = [
         "这么快就完成了，你是最棒的！🏆",
         "又完成一项挑战，你真是太厉害了！🎉"
     ]
+#endif

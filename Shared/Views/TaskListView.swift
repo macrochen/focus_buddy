@@ -1,12 +1,11 @@
 import SwiftUI
 import CoreData
 
+#if os(iOS) 
 struct TaskListView: View {
+    let selectedDate: Date
     @Environment(\.managedObjectContext) private var viewContext
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \FocusTask.order, ascending: true)],  // 添加排序
-        animation: .default)
-    private var tasks: FetchedResults<FocusTask>
+    @FetchRequest private var tasks: FetchedResults<FocusTask>
     @State private var editMode: EditMode = .inactive
     @State private var showingAddTask = false
     @State private var isEditing = false
@@ -14,25 +13,31 @@ struct TaskListView: View {
     @State private var showingDeleteAlert = false
     
     init(selectedDate: Date) {
-        // 获取选中日期的开始和结束时间
+        self.selectedDate = selectedDate
         let calendar = Calendar.current
-        let startOfDay = calendar.startOfDay(for: selectedDate)
-        let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
+        let startDate = calendar.startOfDay(for: selectedDate)
+        let endDate = calendar.date(byAdding: .day, value: 1, to: startDate)!
         
-        // 根据日期过滤任务，并且只显示未完成和进行中的任务
-        let predicate = NSPredicate(format: "date >= %@ AND date < %@ AND (status == nil OR status == %@ OR status == %@)", 
-            startOfDay as NSDate, 
-            endOfDay as NSDate,
-            "未开始",
-            "进行中"
+        // 恢复原有的过滤逻辑，包括任务状态的过滤
+        _tasks = FetchRequest<FocusTask>(
+            sortDescriptors: [NSSortDescriptor(keyPath: \FocusTask.order, ascending: true)],
+            predicate: NSPredicate(
+                format: "date >= %@ AND date < %@ AND (status == nil OR status == %@ OR status == %@)",
+                startDate as NSDate,
+                endDate as NSDate,
+                "未开始",
+                "进行中"
+            )
         )
+    }
+    
+    private func calculateEstimatedEndTime(for tasks: [FocusTask]) -> String {
+        let totalMinutes = tasks.reduce(0) { $0 + Int($1.estimatedTime) }
+        let endTime = Date().addingTimeInterval(Double(totalMinutes * 60))
         
-        _tasks = FetchRequest(
-            entity: FocusTask.entity(),
-            sortDescriptors: [NSSortDescriptor(keyPath: \FocusTask.createdAt, ascending: false)],
-            predicate: predicate,
-            animation: .default
-        )
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter.string(from: endTime)
     }
     
     var body: some View {
@@ -56,6 +61,32 @@ struct TaskListView: View {
                 }
                 .onDelete(perform: deleteTasks)
                 .onMove(perform: moveTasks)  // 添加这行
+                
+                // 添加预估完成时间按钮
+                Section {
+                    Button(action: {
+                        let incompleteTasks = Array(tasks).filter { $0.status == nil || $0.status == "未开始" }
+                        let endTime = calculateEstimatedEndTime(for: incompleteTasks)
+                        
+                        let alert = UIAlertController(
+                            title: "预估完成时间",
+                            message: "如果从现在开始连续完成所有未完成的任务，预计在今天 \(endTime) 完成",
+                            preferredStyle: .alert
+                        )
+                        alert.addAction(UIAlertAction(title: "好的", style: .default))
+                        
+                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                           let viewController = windowScene.windows.first?.rootViewController {
+                            viewController.present(alert, animated: true)
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: "clock.arrow.circlepath")
+                            Text("预估完成时间")
+                        }
+                        .foregroundColor(.blue)
+                    }
+                }
             }
         }
         .environment(\.editMode, .constant(isEditing ? .active : .inactive))
@@ -156,3 +187,5 @@ struct TaskListView_Previews: PreviewProvider {
         }
     }
 }
+
+#endif
